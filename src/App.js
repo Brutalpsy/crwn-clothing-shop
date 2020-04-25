@@ -1,42 +1,59 @@
 import React from 'react';
 import HomePage from './pages/homepage/homepage.componenet';
 import './App.css';
-import { Route, Switch, Link } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
+import ShopPage from './pages/shop/shop.component';
+import Header from './components/header/header-component';
+import SiginInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component';
+import { auth, createUserProfileDocument } from './firebase/firebase.utils';
 
-const HatsPage = (props) => (
-  <div>
-    <Link to='/topics'>Topics</Link>
-    <button onClick={() => props.history.push('/topics')}>goto</button>
-    <h1>Hats page</h1>
-  </div>
-);
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      currentUser: null,
+    };
+  }
 
-const TopicsList = (props) => (
-  <div>
-    <button onClick={() => props.history.push('/hatspage')}>hats</button>
-    <h1>Topic list</h1>
-    <Link to={`${props.match.url}/13`}>to 13</Link> <br />
-    <Link to={`${props.match.url}/14`}>to 14</Link> <br />
-    <Link to={`${props.match.url}/15`}>to 15</Link> <br />
-  </div>
-);
+  unsubscribeFromAuth = null;
 
-const TopicDetail = (props) => (
-  <div>
-    <h1>Topic detail</h1>
-    <button onClick={() => props.history.push('/topics')}>back</button>
-  </div>
-);
+  componentDidMount() {
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+      if (userAuth) {
+        const userRef = createUserProfileDocument(userAuth);
 
-function App() {
-  return (
-    <Switch>
-      <Route exact path='/' component={HomePage} />
-      <Route path='/hatspage' component={HatsPage} />
-      <Route exact path='/topics' component={TopicsList} />
-      <Route path='/topics/:topicId' component={TopicDetail} />
-    </Switch>
-  );
+        (await userRef).onSnapshot((snapshot) => {
+          this.setState({
+            currentUser: {
+              id: snapshot.id,
+              ...snapshot.data(),
+            },
+          });
+        });
+      } else {
+        this.setState({
+          currentUser: userAuth,
+        });
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeFromAuth();
+  }
+
+  render() {
+    return (
+      <div>
+        <Header currentUser={this.state.currentUser} />
+        <Switch>
+          <Route exact path='/' component={HomePage} />
+          <Route path='/shop' component={ShopPage} />
+          <Route path='/signin' component={SiginInAndSignUpPage} />
+        </Switch>
+      </div>
+    );
+  }
 }
 
 export default App;
