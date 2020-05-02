@@ -1,15 +1,18 @@
 import React from 'react';
-import './cart-icon.style.scss';
-import { ReactComponent as ShoppingIcon } from '../../assets/shopping-bag.svg';
+import {
+  ItemCountContainer,
+  CartIconContainer,
+  ShoppingIconContainer,
+} from './cart-icon.styles.jsx';
 import { connect } from 'react-redux';
 import { toggleDropdown } from '../../redux/cart/cart.actions';
 import { selectCartItemsCount } from '../../redux/cart/cart.selectors';
 
 const CartIcon = ({ toggleDropdown, itemCount }) => (
-  <div className='cart-icon' onClick={toggleDropdown}>
-    <ShoppingIcon className='shopping-icon' />
-    <span className='item-count'>{itemCount}</span>
-  </div>
+  <CartIconContainer onClick={toggleDropdown}>
+    <ShoppingIconContainer className='shopping-icon' />
+    <ItemCountContainer>{itemCount}</ItemCountContainer>
+  </CartIconContainer>
 );
 
 const mapStateToPorps = (state) => ({
