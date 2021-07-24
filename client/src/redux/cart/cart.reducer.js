@@ -30,6 +30,11 @@ const cartReducer = (state = INITIAL_STATE, action) => {
           (cartItem) => cartItem.id !== action.item.id
         ),
       };
+    case cartActionTypes.SET_CART_FROM_FIREBASE:
+      return {
+        ...state,
+        cartItems: action.payload,
+      };
     case cartActionTypes.CLEAR_CART:
       return {
         ...state,
